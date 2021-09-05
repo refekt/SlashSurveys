@@ -1,0 +1,4 @@
+/dist/
+.pypirc
+/src/discord_surveys.egg-info
+/instructions
