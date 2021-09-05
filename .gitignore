@@ -1,4 +1,8 @@
 /dist/
 .pypirc
-/src/discord_surveys.egg-info
-/instructions
+*.egg
+*.egg-info/
+*.eggs/
+offline
+.idea
+.gitignore
