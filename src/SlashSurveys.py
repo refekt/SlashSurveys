@@ -1,8 +1,8 @@
+import asyncio
 import hashlib
 import random
 import string
 import typing
-from asyncio import TimeoutError as TE
 
 from discord import (
     Embed
@@ -33,8 +33,7 @@ class SurveyOption:
     def __init__(self, label: typing.AnyStr):
         assert isinstance(label, str), ValueError("Label must be a string!")
 
-        key = generate_random_key()
-        self.custom_id: typing.AnyStr = f"{key}_label"
+        self.custom_id: typing.AnyStr = f"{generate_random_key()}_label"
         self.label: typing.AnyStr = label
         self.value: int = 0
 
@@ -70,7 +69,7 @@ class Survey:
         self.embed: Embed = Embed()
         self.options: typing.List[SurveyOption] = options
         self.question: typing.Union[typing.AnyStr, None] = question
-        self.timeout = timeout
+        self.timeout: int = timeout
 
     def create_embed(self):
         embed = Embed(
@@ -161,6 +160,6 @@ class Survey:
                     await btn_ctx.send("Added your vote, thank you!", hidden=True)
                 else:
                     await btn_ctx.send("You cannot vote more than once!", hidden=True)
-            except TE:
+            except asyncio.TimeoutError:
                 go = False
                 await self.close_survey(btn_ctx)
