@@ -12,8 +12,8 @@ REQUIRES_PYTHON = ">=3.7.0"
 VERSION = "1.0.6"
 
 REQUIRED = [
-    "discord-py-interactions==3.0.2",
-    "discord==1.7.3"
+    "discord-py-interactions",
+    "discord.py"
 ]
 
 EXTRAS = {
