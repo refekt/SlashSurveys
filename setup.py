@@ -9,7 +9,7 @@ URL = "https://github.com/refekt/discord-surveys"
 EMAIL = "refekt@gmail.com"
 AUTHOR = "refekt"
 REQUIRES_PYTHON = ">=3.7.0"
-VERSION = "1.0.5"
+VERSION = "1.0.6"
 
 REQUIRED = [
     "discord-py-interactions==3.0.2",
@@ -38,14 +38,12 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    py_modules=["SlashSurveys"],
+    packages=[NAME],
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
     license="MIT",
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
