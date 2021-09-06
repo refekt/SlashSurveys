@@ -26,10 +26,22 @@ from discord_slash.utils.manage_components import (
 
 
 def generate_random_key() -> str:
+    """
+    Creates and returns a randomly generated 10 character alphanumeric string.
+
+    :return:
+    """
     return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 class SurveyOption:
+    """
+    A class to represent a survey option.
+
+    Attributes:
+    :param label:
+    """
+
     def __init__(self, label: typing.AnyStr):
         assert isinstance(label, str), ValueError("Label must be a string!")
 
@@ -39,6 +51,24 @@ class SurveyOption:
 
 
 class Survey:
+    """
+    A class to represent a Discord Survey.
+
+    Attributes:
+    :param bot `typing.Union[AutoShardedBot, Bot]`:
+    :param ctx `discord_slash.context.SlashContext`:
+    :param options `typing.AnyStr`:
+    :param question `typing.AnyStr`:
+    :param timeout `int`:
+
+    Methods:
+    create_embed()
+    update_embed()
+    await close_survey()
+    actionrow()
+    send()
+    """
+
     def __init__(self,
                  bot: typing.Union[AutoShardedBot, Bot],
                  ctx: SlashContext,
@@ -71,7 +101,29 @@ class Survey:
         self.question: typing.Union[typing.AnyStr, None] = question
         self.timeout: int = timeout
 
+    def actionrow(self) -> typing.List[dict]:
+        """
+        Creates and returns a `typing.List[dict]` from `discord_slash.utils.manage_components.create_actionrow()`
+
+        :return:
+        """
+        buttons = []
+        for opt in self.options:
+            buttons.append(
+                create_button(
+                    style=ButtonStyle.gray,
+                    label=opt.label,
+                    custom_id=opt.custom_id
+                )
+            )
+        return [create_actionrow(*buttons)]
+
     def create_embed(self):
+        """
+        Creats and sets `self.embed` with a `discord.Embed`
+
+        :return:
+        """
         embed = Embed(
             title="Survey",
             description=f"Please provide your feedback. This survey timesout in {self.timeout} seconds.",
@@ -92,7 +144,14 @@ class Survey:
             )
         self.embed = embed
 
-    def update_embed(self, user_id: str, opt: str):
+    def update_embed(self, user_id: str, opt: str) -> bool:
+        """
+        Updates `self.embed` with a new `discord.Embed`
+
+        :param user_id: `str` Takes `discord.User.id` and converts it to a hash.
+        :param opt: `str` Takes a `SurveyOption` and adds to `value`
+        :return:
+        """
         hashed_user = hashlib.sha1(str(user_id).encode("UTF-8")).hexdigest()[:10]
         if hashed_user in self.embed.footer.text:
             return False
@@ -109,26 +168,12 @@ class Survey:
         )
         return True
 
-    async def close_survey(self, ctx: ComponentContext):
-        await ctx.origin_message.edit(
-            content="",
-            embed=self.embed,
-            components=None
-        )
-
-    def actionrow(self):
-        buttons = []
-        for opt in self.options:
-            buttons.append(
-                create_button(
-                    style=ButtonStyle.gray,
-                    label=opt.label,
-                    custom_id=opt.custom_id
-                )
-            )
-        return [create_actionrow(*buttons)]
-
     async def send(self):
+        """
+        Sends a `discord.Embed` with all `SurveyOption` data populated
+
+        :return:
+        """
         await self.ctx.defer()
 
         self.create_embed()
@@ -163,3 +208,17 @@ class Survey:
             except asyncio.TimeoutError:
                 go = False
                 await self.close_survey(btn_ctx)
+
+    async def close_survey(self, ctx: ComponentContext):
+        """
+        Closes the survey by editing the original messsage and removing the components
+
+        Attributes
+        :param ctx: `discord_slash.context.ComponentContext`
+        :return:
+        """
+        await ctx.origin_message.edit(
+            content="",
+            embed=self.embed,
+            components=None
+        )
