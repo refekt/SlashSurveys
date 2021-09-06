@@ -1,1 +1,1 @@
-from .SlashSurveys import *
+from .survey import *
