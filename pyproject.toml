@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
+    "discord-py-interactions==3.0.2",
     "discord==1.7.3",
-    "discord-py-interactions==3.0.2"
+    "setuptools>=42",
+    "wheel"
 ]
 build-backend = "setuptools.build_meta"
