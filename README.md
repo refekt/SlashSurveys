@@ -6,6 +6,8 @@ A survey object that utilizes discord.py and discord-interactions.
 
 ![Example](https://i.imgur.com/7zqcdOz.png)
 
+![Example](https://i.imgur.com/ql2lcKg.png)
+
 ### Python
 ```py
 from discord_surveys import Survey
