@@ -3,13 +3,13 @@ import os
 
 from setuptools import setup
 
-NAME = "discord-surveys"
+NAME = "discord_surveys"
 DESCRIPTION = "A survey object that utilizes discord.py and discord-interactions."
 URL = "https://github.com/refekt/discord-surveys"
 EMAIL = "refekt@gmail.com"
 AUTHOR = "refekt"
 REQUIRES_PYTHON = ">=3.7.0"
-VERSION = "1.0.6"
+VERSION = "1.0.7"
 
 REQUIRED = [
     "discord-py-interactions",
