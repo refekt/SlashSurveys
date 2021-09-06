@@ -207,18 +207,29 @@ class Survey:
                     await btn_ctx.send("You cannot vote more than once!", hidden=True)
             except asyncio.TimeoutError:
                 go = False
-                await self.close_survey(btn_ctx)
 
-    async def close_survey(self, ctx: ComponentContext):
+                if btn_ctx is None:
+                    await self.close_survey(self.ctx)
+                else:
+                    await self.close_survey(btn_ctx)
+
+    async def close_survey(self, ctx: typing.Union[ComponentContext, SlashContext]):
         """
-        Closes the survey by editing the original messsage and removing the components
+        Closes the survey by removing the components
 
         Attributes
-        :param ctx: `discord_slash.context.ComponentContext`
+        :param ctx: `typing.Union[discord_slash.context.ComponentContext, discord_slash.context.SlashContext]`
         :return:
         """
-        await ctx.origin_message.edit(
-            content="",
-            embed=self.embed,
-            components=None
-        )
+        if type(ctx) == ComponentContext:
+            await ctx.origin_message.edit(
+                content="",
+                embed=self.embed,
+                components=None
+            )
+        elif type(ctx) == SlashContext:
+            await ctx.message.edit(
+                content="",
+                embed=self.embed,
+                components=None
+            )

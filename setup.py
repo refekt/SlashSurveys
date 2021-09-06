@@ -7,7 +7,7 @@ pkg_name = "discord-surveys"
 
 setuptools.setup(
     name=pkg_name,
-    version="1.0.0",
+    version="1.0.1",
     author="refekt",
     description="A survey object that utilizes discord.py and discord-interactions.",
     long_description=long_description,
