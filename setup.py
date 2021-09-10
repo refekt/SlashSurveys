@@ -9,7 +9,7 @@ URL = "https://github.com/refekt/discord-surveys"
 EMAIL = "refekt@gmail.com"
 AUTHOR = "refekt"
 REQUIRES_PYTHON = ">=3.7.0"
-VERSION = "1.0.8"
+VERSION = "1.0.9"
 
 REQUIRED = [
     "discord-py-interactions",
