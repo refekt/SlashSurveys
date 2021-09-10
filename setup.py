@@ -3,7 +3,7 @@ import os
 
 from setuptools import setup
 
-NAME = "discord-surveys"
+NAME = "discord_surveys"
 DESCRIPTION = "A survey object that utilizes discord.py and discord-interactions."
 URL = "https://github.com/refekt/discord-surveys"
 EMAIL = "refekt@gmail.com"
