@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import math
 import random
 import string
 import typing
@@ -48,11 +49,11 @@ class Survey:
     A class to represent a Discord Survey.
 
     Attributes:
-    :param bot `typing.Union[AutoShardedBot, Bot]`:
-    :param ctx `discord_slash.context.SlashContext`:
-    :param options `typing.AnyStr`:
-    :param question `typing.AnyStr`:
-    :param timeout `int`:
+    :param bot `typing.Union[AutoShardedBot, Bot]`: The Discord bot object.
+    :param ctx `discord_slash.context.SlashContext`: The SlashContext currently being used.
+    :param options `typing.AnyStr`: The space-delimited list of options.
+    :param question `typing.AnyStr`: The question being presented.
+    :param timeout `int`: How many seconds to ask the question.
 
     Methods:
     create_embed()
@@ -93,13 +94,14 @@ class Survey:
         assert 2 <= len(options) <= max_options, ValueError(
             f"You must have at least 2 and less than {max_options} options!"
         )
+        assert timeout is not None, ValueError("You must provide a timeout value!")
 
         self.bot: typing.Union[AutoShardedBot, Bot] = bot
         self.ctx: SlashContext = ctx
         self.embed: Embed = Embed()
         self.options: typing.List[SurveyOption] = options
         self.question: typing.Optional[typing.AnyStr] = question
-        self.timeout: int = timeout
+        self.timeout: int = math.ceil(timeout)
 
     def actionrow(self) -> typing.List[dict]:
         """
@@ -169,11 +171,11 @@ class Survey:
             components=self.actionrow(),
         )
 
-        if self.timeout == 0:
-            return
-
         go = True
         btn_ctx: typing.Optional[ComponentContext] = None
+
+        if self.timeout <= 0:
+            self.timeout = 60 * 60 * 24  # Full day
 
         while go:
             try:
