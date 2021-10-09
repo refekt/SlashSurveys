@@ -11,10 +11,7 @@ AUTHOR = "refekt"
 REQUIRES_PYTHON = ">=3.7.0"
 VERSION = "1.0.9"
 
-REQUIRED = [
-    "discord-py-interactions",
-    "discord.py"
-]
+REQUIRED = ["discord-py-interactions", "discord.py"]
 
 EXTRAS = {
     # "fancy feature": ["django"],
@@ -47,5 +44,5 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ]
+    ],
 )
