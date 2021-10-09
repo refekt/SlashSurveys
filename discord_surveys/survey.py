@@ -4,24 +4,14 @@ import random
 import string
 import typing
 
-from discord import (
-    Embed
-)
-from discord.ext.commands import (
-    AutoShardedBot,
-    Bot
-)
-from discord_slash.context import (
-    ComponentContext,
-    SlashContext
-)
-from discord_slash.model import (
-    ButtonStyle
-)
+from discord import Embed
+from discord.ext.commands import AutoShardedBot, Bot
+from discord_slash.context import ComponentContext, SlashContext
+from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_components import (
     create_actionrow,
     create_button,
-    wait_for_component
+    wait_for_component,
 )
 
 
@@ -31,7 +21,10 @@ def generate_random_key() -> str:
 
     :return:
     """
-    return "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    return "".join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+        for _ in range(10)
+    )
 
 
 class SurveyOption:
@@ -45,7 +38,7 @@ class SurveyOption:
     def __init__(self, label: typing.AnyStr):
         assert isinstance(label, str), ValueError("Label must be a string!")
 
-        self.custom_id: typing.AnyStr = f"{generate_random_key()}_label"
+        self.custom_id: typing.AnyStr = f"{generate_random_key()}_survey_option"
         self.label: typing.AnyStr = label
         self.value: int = 0
 
@@ -69,13 +62,14 @@ class Survey:
     send()
     """
 
-    def __init__(self,
-                 bot: typing.Union[AutoShardedBot, Bot],
-                 ctx: SlashContext,
-                 options: typing.AnyStr,
-                 question: typing.AnyStr,
-                 timeout: int = 120,
-                 ):
+    def __init__(
+        self,
+        bot: typing.Union[AutoShardedBot, Bot],
+        ctx: SlashContext,
+        options: typing.AnyStr,
+        question: typing.AnyStr,
+        timeout: typing.Optional[int] = None,
+    ):
 
         options = options.strip()
         if " " in options:
@@ -83,7 +77,9 @@ class Survey:
         else:
             options = [options]
 
-        assert len(options) == len(set(options)), ValueError(f"You cannot use the same option more than once!")
+        assert len(options) == len(set(options)), ValueError(
+            f"You cannot use the same option more than once!"
+        )
 
         for index, opt in enumerate(options):
             options[index] = SurveyOption(opt)
@@ -91,14 +87,18 @@ class Survey:
         max_options = 3
 
         assert isinstance(question, str), ValueError("Question must be a string!")
-        assert [isinstance(opt, SurveyOption) for opt in options], ValueError("Options must be a SurveyOption object!")
-        assert 2 <= len(options) <= max_options, ValueError(f"You must have at least 2 and less than {max_options} options!")
+        assert [isinstance(opt, SurveyOption) for opt in options], ValueError(
+            "Options must be a SurveyOption object!"
+        )
+        assert 2 <= len(options) <= max_options, ValueError(
+            f"You must have at least 2 and less than {max_options} options!"
+        )
 
         self.bot: typing.Union[AutoShardedBot, Bot] = bot
         self.ctx: SlashContext = ctx
         self.embed: Embed = Embed()
         self.options: typing.List[SurveyOption] = options
-        self.question: typing.Union[typing.AnyStr, None] = question
+        self.question: typing.Optional[typing.AnyStr] = question
         self.timeout: int = timeout
 
     def actionrow(self) -> typing.List[dict]:
@@ -111,9 +111,7 @@ class Survey:
         for opt in self.options:
             buttons.append(
                 create_button(
-                    style=ButtonStyle.gray,
-                    label=opt.label,
-                    custom_id=opt.custom_id
+                    style=ButtonStyle.gray, label=opt.label, custom_id=opt.custom_id
                 )
             )
         return [create_actionrow(*buttons)]
@@ -128,20 +126,10 @@ class Survey:
             title="Survey",
             description=f"Please provide your feedback. This survey timesout in {self.timeout} seconds.",
         )
-        embed.set_footer(
-            text="Users:"
-        )
-        embed.add_field(
-            name="Survey Question",
-            value=self.question,
-            inline=False
-        )
+        embed.set_footer(text="Users:")
+        embed.add_field(name="Survey Question", value=self.question, inline=False)
         for index, opt in enumerate(self.options):
-            embed.add_field(
-                name=opt.label,
-                value=str(opt.value),
-                inline=False
-            )
+            embed.add_field(name=opt.label, value=str(opt.value), inline=False)
         self.embed = embed
 
     def update_embed(self, user_id: str, opt: str) -> bool:
@@ -163,9 +151,7 @@ class Survey:
 
         footer_text = self.embed.footer.text
         self.create_embed()
-        self.embed.set_footer(
-            text=f"{footer_text} {hashed_user} "
-        )
+        self.embed.set_footer(text=f"{footer_text} {hashed_user} ")
         return True
 
     async def send(self):
@@ -174,32 +160,31 @@ class Survey:
 
         :return:
         """
-        await self.ctx.defer()
 
         self.create_embed()
+
+        await self.ctx.defer()
         await self.ctx.send(
             embed=self.embed,
-            components=self.actionrow()
+            components=self.actionrow(),
         )
 
+        if self.timeout == 0:
+            return
+
         go = True
-        btn_ctx: typing.Union[None, ComponentContext] = None
+        btn_ctx: typing.Optional[ComponentContext] = None
 
         while go:
             try:
                 btn_ctx: ComponentContext = await wait_for_component(
-                    client=self.bot,
-                    timeout=self.timeout,
-                    components=self.actionrow()
+                    client=self.bot, timeout=self.timeout, components=self.actionrow()
                 )
                 resp = self.update_embed(
-                    user_id=btn_ctx.author_id,
-                    opt=btn_ctx.component["label"]
+                    user_id=btn_ctx.author_id, opt=btn_ctx.component["label"]
                 )
                 await btn_ctx.origin_message.edit(
-                    content="",
-                    embed=self.embed,
-                    components=self.actionrow()
+                    content="", embed=self.embed, components=self.actionrow()
                 )
                 if resp:
                     await btn_ctx.send("Added your vote, thank you!", hidden=True)
@@ -222,14 +207,6 @@ class Survey:
         :return:
         """
         if type(ctx) == ComponentContext:
-            await ctx.origin_message.edit(
-                content="",
-                embed=self.embed,
-                components=None
-            )
+            await ctx.origin_message.edit(content="", embed=self.embed, components=None)
         elif type(ctx) == SlashContext:
-            await ctx.message.edit(
-                content="",
-                embed=self.embed,
-                components=None
-            )
+            await ctx.message.edit(content="", embed=self.embed, components=None)
